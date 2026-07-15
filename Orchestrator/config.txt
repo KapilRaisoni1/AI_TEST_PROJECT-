@@ -1,0 +1,14 @@
+from pydantic_settings import BaseSettings
+
+class Settings(BaseSettings):
+    OPENROUTER_API_KEY:  str
+    OPENROUTER_MODEL:    str = "google/gemini-2.5-flash"
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+
+    class Config:
+        env_file = ".env"
+
+try:
+    settings = Settings()
+except Exception:
+    settings = Settings.model_construct()
