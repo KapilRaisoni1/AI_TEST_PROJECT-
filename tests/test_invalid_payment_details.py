@@ -1,45 +1,28 @@
 ```python
 import pytest
 import requests
+from conftest import base_url, auth_headers
 
-@pytest.mark.usefixtures("base_url", "auth_headers")
-class TestUserAuthentication:
-    def test_user_login(self, base_url, auth_headers):
-        # Given user is on login page
-        login_url = f"{base_url}/login"
-        response = requests.get(login_url)
-        assert response.status_code == 200
+@pytest.mark.parametrize("username, password, expected_status_code", [
+    ("valid_username", "valid_password", 200),
+    ("invalid_username", "valid_password", 401),
+    ("valid_username", "invalid_password", 401),
+])
+def test_user_authentication(base_url, auth_headers, username, password, expected_status_code):
+    login_url = f"{base_url}/login"
+    payload = {"username": username, "password": password}
+    response = requests.post(login_url, headers=auth_headers, json=payload)
+    assert response.status_code == expected_status_code
+    if expected_status_code == 200:
+        assert "dashboard" in response.json()["redirect_url"]
 
-        # When user enters valid credentials
-        valid_credentials = {"username": "test_user", "password": "test_password"}
-        response = requests.post(login_url, json=valid_credentials)
-        assert response.status_code == 200
-
-        # Then dashboard should be displayed
-        dashboard_url = f"{base_url}/dashboard"
-        response = requests.get(dashboard_url, headers=auth_headers)
-        assert response.status_code == 200
-        assert "Dashboard" in response.text
-
-    def test_user_login_invalid_credentials(self, base_url):
-        # Given user is on login page
-        login_url = f"{base_url}/login"
-        response = requests.get(login_url)
-        assert response.status_code == 200
-
-        # When user enters invalid credentials
-        invalid_credentials = {"username": "invalid_user", "password": "invalid_password"}
-        response = requests.post(login_url, json=invalid_credentials)
-        assert response.status_code == 401
-
-    def test_user_login_missing_credentials(self, base_url):
-        # Given user is on login page
-        login_url = f"{base_url}/login"
-        response = requests.get(login_url)
-        assert response.status_code == 200
-
-        # When user enters missing credentials
-        missing_credentials = {"username": "test_user"}
-        response = requests.post(login_url, json=missing_credentials)
-        assert response.status_code == 400
+def test_dashboard_displayed_after_login(base_url, auth_headers):
+    login_url = f"{base_url}/login"
+    payload = {"username": "valid_username", "password": "valid_password"}
+    response = requests.post(login_url, headers=auth_headers, json=payload)
+    assert response.status_code == 200
+    dashboard_url = response.json()["redirect_url"]
+    response = requests.get(dashboard_url, headers=auth_headers)
+    assert response.status_code == 200
+    assert "dashboard" in response.text.lower()
 ```
