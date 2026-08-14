@@ -1,6 +1,7 @@
 ```python
 import pytest
 import requests
+from conftest import base_url, auth_headers
 
 @pytest.mark.usefixtures("base_url", "auth_headers")
 class TestUserAuthentication:
@@ -25,10 +26,9 @@ class TestUserAuthentication:
         assert response.status_code == 400
         assert "username and password are required" in response.json()["error_message"]
 
-    def test_missing_credentials(self, base_url):
-        login_url = f"{base_url}/login"
-        missing_credentials = {"username": "test_user"}
-        response = requests.post(login_url, json=missing_credentials)
-        assert response.status_code == 400
-        assert "password is required" in response.json()["error_message"]
+    def test_dashboard_access(self, base_url, auth_headers):
+        dashboard_url = f"{base_url}/dashboard"
+        response = requests.get(dashboard_url, headers=auth_headers)
+        assert response.status_code == 200
+        assert "dashboard" in response.json()["page_title"]
 ```
