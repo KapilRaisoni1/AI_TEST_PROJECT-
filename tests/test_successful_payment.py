@@ -31,6 +31,17 @@ def test_invalid_credentials(base_url, auth_headers):
     response = requests.post(login_url, json=invalid_credentials, headers=auth_headers)
     assert response.status_code == 401
 
+def test_empty_credentials(base_url, auth_headers):
+    # Given user is on login page
+    login_url = f"{base_url}/login"
+    response = requests.get(login_url)
+    assert response.status_code == 200
+
+    # When user enters empty credentials
+    empty_credentials = {"username": "", "password": ""}
+    response = requests.post(login_url, json=empty_credentials, headers=auth_headers)
+    assert response.status_code == 400
+
 def test_missing_credentials(base_url, auth_headers):
     # Given user is on login page
     login_url = f"{base_url}/login"
@@ -40,16 +51,5 @@ def test_missing_credentials(base_url, auth_headers):
     # When user enters missing credentials
     missing_credentials = {"username": "test_user"}
     response = requests.post(login_url, json=missing_credentials, headers=auth_headers)
-    assert response.status_code == 400
-
-def test_empty_credentials(base_url, auth_headers):
-    # Given user is on login page
-    login_url = f"{base_url}/login"
-    response = requests.get(login_url)
-    assert response.status_code == 200
-
-    # When user enters empty credentials
-    empty_credentials = {}
-    response = requests.post(login_url, json=empty_credentials, headers=auth_headers)
     assert response.status_code == 400
 ```
