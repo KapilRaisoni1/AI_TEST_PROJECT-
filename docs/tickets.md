@@ -67,7 +67,7 @@ Transaction ID should be generated for successful payments.
 
 ---
 ## AC-4: Confirmation Email
-**Type:** acceptance_criteria | **Priority:** low
+**Type:** acceptance_criteria | **Priority:** medium
 
 Confirmation email should be sent after successful payment.
 
