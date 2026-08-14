@@ -12,9 +12,9 @@
 **Then:** User is redirected to login page
 
 ### AC 3
-**Given:** User session has expired
+**Given:** User login credentials are expired
 **When:** User initiates payment
-**Then:** User is redirected to login page
+**Then:** User is prompted to update login credentials
 
 ---
 ## FR-2 - Payment Initiation
@@ -26,12 +26,12 @@
 ### AC 2
 **Given:** User has a valid account
 **When:** User enters invalid payment details
-**Then:** System displays an error message
+**Then:** System displays error message for invalid fields
 
 ### AC 3
 **Given:** User has a valid account
-**When:** User enters a payment amount exceeding the limit
-**Then:** System displays a warning message
+**When:** User enters payment amount exceeding the limit
+**Then:** System displays error message for payment amount limit exceeded
 
 ---
 ## FR-3 - Payment Processing
@@ -46,26 +46,26 @@
 **Then:** Error message is displayed
 
 ### AC 3
-**Given:** Payment gateway is down
+**Given:** Network connection is lost
 **When:** Payment is processed
 **Then:** Error message is displayed
 
 ---
 ## FR-4 - Payment Confirmation
 ### AC 1
-**Given:** User has made a payment
+**Given:** User completes payment
 **When:** Payment is processed
 **Then:** System displays payment success confirmation
 
 ### AC 2
-**Given:** User has made a payment
-**When:** Payment is declined
-**Then:** System displays payment failure message
+**Given:** User enters invalid payment details
+**When:** Payment is processed
+**Then:** System displays error message
 
 ### AC 3
-**Given:** User has made a payment with insufficient balance
+**Given:** User has multiple pending payments
 **When:** Payment is processed
-**Then:** System displays low balance error message
+**Then:** System sends confirmation email for each payment
 
 ---
 ## FR-5 - Transaction History
@@ -87,19 +87,19 @@
 ---
 ## NFR-1 - Response Time
 ### AC 1
-**Given:** Normal system load
-**When:** User submits a request
-**Then:** Response is received within 3 seconds
+**Given:** A user sends a request
+**When:** The system processes the request
+**Then:** The response is received within 3 seconds
 
 ### AC 2
-**Given:** Invalid user input
-**When:** User submits a request
-**Then:** Error message is displayed within 3 seconds
+**Given:** A user sends an invalid request
+**When:** The system validates the request
+**Then:** An error message is returned within 3 seconds
 
 ### AC 3
-**Given:** High system load
-**When:** Multiple users submit requests
-**Then:** Average response time is less than 3 seconds
+**Given:** A large number of users send requests simultaneously
+**When:** The system handles the high load
+**Then:** The average response time remains below 3 seconds
 
 ---
 ## NFR-2 - System Availability
@@ -116,7 +116,7 @@
 ### AC 3
 **Given:** High traffic volume
 **When:** Multiple users access the system simultaneously
-**Then:** System responds within 2 seconds and remains available
+**Then:** System responds within acceptable latency thresholds
 
 ---
 ## NFR-3 - Payment Information Encryption
@@ -128,12 +128,12 @@
 ### AC 2
 **Given:** Invalid payment information is entered
 **When:** Payment is processed
-**Then:** Error message is displayed and payment information is not stored
+**Then:** Error message is displayed and payment information is not encrypted
 
 ### AC 3
 **Given:** Payment information is empty
 **When:** Payment is processed
-**Then:** Error message is displayed and payment is not processed
+**Then:** Error message is displayed and payment information is not encrypted
 
 ---
 ## AC-1 - Successful Payment
@@ -143,31 +143,31 @@
 **Then:** Payment is processed successfully
 
 ### AC 2
-**Given:** User has invalid payment details
+**Given:** User enters invalid payment details
 **When:** User submits payment
-**Then:** Payment is rejected with error message
+**Then:** Error message is displayed
 
 ### AC 3
-**Given:** User has exact amount for payment
+**Given:** User has exactly enough funds
 **When:** User submits payment
-**Then:** Payment is processed without remaining balance
+**Then:** Payment is processed and balance is updated to zero
 
 ---
 ## AC-2 - Invalid Payment Details
 ### AC 1
-**Given:** Valid user account
-**When:** User attempts to make a payment with valid details
+**Given:** Valid payment details
+**When:** User submits payment
 **Then:** Payment is processed successfully
 
 ### AC 2
-**Given:** Valid user account
-**When:** User attempts to make a payment with invalid card number
-**Then:** Payment is rejected with an error message
+**Given:** Invalid payment details
+**When:** User submits payment
+**Then:** Payment is rejected with error message
 
 ### AC 3
-**Given:** Valid user account
-**When:** User attempts to make a payment with expired card
-**Then:** Payment is rejected with an error message
+**Given:** Payment details are empty
+**When:** User submits payment
+**Then:** Payment is rejected with error message
 
 ---
 ## AC-3 - Transaction ID Generation
@@ -182,9 +182,9 @@
 **Then:** No transaction ID is generated
 
 ### AC 3
-**Given:** A user makes multiple successful payments in a row
+**Given:** A user makes multiple successful payments
 **When:** Each payment is processed
-**Then:** A new unique transaction ID is generated for each payment
+**Then:** A unique transaction ID is generated for each payment
 
 ---
 ## AC-4 - Confirmation Email
