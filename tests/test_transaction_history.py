@@ -6,14 +6,14 @@ import requests
 class TestUserAuthentication:
     def test_valid_credentials(self, base_url, auth_headers):
         login_url = f"{base_url}/login"
-        credentials = {"username": "test_user", "password": "test_password"}
+        credentials = {"username": "testuser", "password": "testpassword"}
         response = requests.post(login_url, json=credentials)
         assert response.status_code == 200
         assert "dashboard" in response.json()["redirect_url"]
 
     def test_invalid_credentials(self, base_url):
         login_url = f"{base_url}/login"
-        credentials = {"username": "invalid_user", "password": "invalid_password"}
+        credentials = {"username": "invaliduser", "password": "invalidpassword"}
         response = requests.post(login_url, json=credentials)
         assert response.status_code == 401
         assert "invalid credentials" in response.json()["error_message"]
