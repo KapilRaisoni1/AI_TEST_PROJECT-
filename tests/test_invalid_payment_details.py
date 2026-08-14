@@ -1,28 +1,33 @@
 ```python
 import pytest
 import requests
-from conftest import base_url, auth_headers
 
-@pytest.mark.parametrize("username, password, expected_status_code", [
-    ("valid_username", "valid_password", 200),
-    ("invalid_username", "valid_password", 401),
-    ("valid_username", "invalid_password", 401),
-])
-def test_user_authentication(base_url, auth_headers, username, password, expected_status_code):
-    login_url = f"{base_url}/login"
-    payload = {"username": username, "password": password}
-    response = requests.post(login_url, headers=auth_headers, json=payload)
-    assert response.status_code == expected_status_code
-    if expected_status_code == 200:
+@pytest.mark.usefixtures("base_url", "auth_headers")
+class TestUserAuthentication:
+    def test_valid_credentials(self, base_url, auth_headers):
+        login_url = f"{base_url}/login"
+        credentials = {"username": "test_user", "password": "test_password"}
+        response = requests.post(login_url, json=credentials)
+        assert response.status_code == 200
         assert "dashboard" in response.json()["redirect_url"]
 
-def test_dashboard_displayed_after_login(base_url, auth_headers):
-    login_url = f"{base_url}/login"
-    payload = {"username": "valid_username", "password": "valid_password"}
-    response = requests.post(login_url, headers=auth_headers, json=payload)
-    assert response.status_code == 200
-    dashboard_url = response.json()["redirect_url"]
-    response = requests.get(dashboard_url, headers=auth_headers)
-    assert response.status_code == 200
-    assert "dashboard" in response.text.lower()
+    def test_invalid_credentials(self, base_url):
+        login_url = f"{base_url}/login"
+        credentials = {"username": "invalid_user", "password": "invalid_password"}
+        response = requests.post(login_url, json=credentials)
+        assert response.status_code == 401
+        assert "invalid credentials" in response.json()["error_message"]
+
+    def test_empty_credentials(self, base_url):
+        login_url = f"{base_url}/login"
+        credentials = {"username": "", "password": ""}
+        response = requests.post(login_url, json=credentials)
+        assert response.status_code == 400
+        assert "username and password are required" in response.json()["error_message"]
+
+    def test_authenticated_user(self, base_url, auth_headers):
+        dashboard_url = f"{base_url}/dashboard"
+        response = requests.get(dashboard_url, headers=auth_headers)
+        assert response.status_code == 200
+        assert "dashboard" in response.json()["page_title"]
 ```
